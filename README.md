@@ -76,6 +76,7 @@ On performing the steps mentioned above the result can be seen as follows,
 After launching the packages for bringing up the robot in Gazebo and node to control the robot arm through MoveIt the following commands has to be executed in the terminal.
 
 ```sh
+sudo apt install ros-melodic-stereo-image-proc
 roslaunch pose_estimation pose_estimation.launch
 roslaunch pose_estimation stereo_point_cloud.launch
 ```
