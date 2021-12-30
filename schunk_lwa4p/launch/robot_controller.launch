@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="rviz_schunk_config" default="$(find schunk_lwa4p)/config/rviz_stereo_setup_schunk.rviz"/>
+
+  <!-- start gazebo with empty world -->
+  <!--include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="gui" value="$(arg gui)" />
+  </include-->
+
+  <!-- start gazebo with objects world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="$(find ros_stereo_vision)/world/objects_table.world"/>
+  </include>
+
+  <!-- send lwa4p urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find schunk_lwa4p)/urdf/robot.urdf.xacro'" />
+
+
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model lwa4p -z 0.01 " respawn="false" output="screen" />
+
+  <!-- robot state publisher -->
+  <!--node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" type="string" value="" />
+      <!remap from="joint_states" to="/arm/joint_states"/->
+  </node-->
+
+  <!-- tf and controllers for the robot in simulation and moveit to communicate-->
+   <include file="$(find schunk_arm_pg70_moveit_config)/launch/ros_controllers.launch"/>
+
+   <node pkg="tf" type="static_transform_publisher" name="gripper_refer_link" args="0 0 0.0789 0.0 0.0 0.0 pg70_palm_link eef_pose_link 100" />
+    
+    <!-- launching the rviz to visulaize the frames of the robot-->
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(arg rviz_schunk_config)" />
+  <!-- <node name="joint_state_publisher" type="joint_state_publisher" pkg="joint_state_publisher" output="screen">
+    <param name="use_gui" value="true"/>
+    <remap from="joint_states" to="/arm/joint_states"/>
+  </node> -->
+
+  <!-- controllers -->
+  <!--<rosparam command="load" file="$(find schunk_lwa4p)/config/schunk_controllers.yaml"/>-->
+
+  <!--rosparam ns="/arm" command="load" file="$(find schunk_pg70)/config/gripper_controller.yaml" /-->
+
+  <!--<node ns="/arm" name="controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller arm_1_joint_position_controller arm_2_joint_position_controller arm_3_joint_position_controller arm_4_joint_position_controller arm_5_joint_position_controller arm_6_joint_position_controller gripper_left_joint_position_controller gripper_right_joint_position_controller" respawn="false" output="screen"/>-->
+
+</launch>

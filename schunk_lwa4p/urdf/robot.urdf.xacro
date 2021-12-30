@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="lwa4p" >
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find schunk_description)/urdf/common.xacro" />
+  <xacro:include filename="$(find schunk_description)/urdf/materials.urdf.xacro" />
+
+  <!-- schunk lwa4p -->
+  <xacro:include filename="$(find schunk_description)/urdf/lwa4p/lwa4p.urdf.xacro" />
+
+  
+  <link name ="world"/>
+  <!-- Used for fixing robot to Gazebo -->
+  <link name="ground_robot_base">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.3 0.5"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3 0.3 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="10"/>
+      <inertia ixx="0.28333333333333327" ixy="0.0" ixz="0.0" iyy="0.28333333333333327" iyz="0.0" izz="0.15" />
+    </inertial>
+  </link>
+  
+  <joint name="world_ground_robot_base" type="fixed">
+    <origin xyz="0.9 0.6 0.25" rpy="0 0 0"/>
+    <parent link="world"/>
+    <child link="ground_robot_base"/>
+  </joint>
+
+<!-- camera setup for finding the objects-->
+  <xacro:include filename="$(find stereo_camera_setup)/description/stereo_setup.urdf.xacro" />
+
+  <xacro:camera_setup parent="world" />
+
+  
+
+  <!-- arm -->
+  <xacro:schunk_lwa4p name="arm" parent="ground_robot_base" has_podest="true">
+    <origin xyz="0 0 0.302" rpy="0 0 0" /> <!--slightly above gazebo plane-->
+  </xacro:schunk_lwa4p>
+
+</robot>
